@@ -71,14 +71,14 @@ public class PingActor extends UntypedActor {
           if(myClass.getCounter()!= -1) {
           System.out.println("Pong send counter:" + myClass.getCounter() + " have data:" + myClass.getData());
           }else {
-            System.out.println("Not Pong send maybe system send");
+            System.out.println("Not Pong send maybe " +getSender() +" send");
           }
           counter ++;        
           System.out.println("Start send message to pong at counter=" + counter);
           if(counter == 10) {        
           
-            System.out.println("because this is 10 th then shutdown");
-            getContext().system().shutdown();
+            System.out.println("because this is 10 th then stop");
+            getContext().stop(getSelf());;
           }else {
             pongActor.tell(new MyClass(counter), getSelf());
           }

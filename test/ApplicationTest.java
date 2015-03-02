@@ -1,23 +1,22 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import static org.fest.assertions.Assertions.assertThat;
+import static play.test.Helpers.contentAsString;
+import static play.test.Helpers.contentType;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.*;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
-import play.mvc.*;
-import play.test.*;
-import play.data.DynamicForm;
-import play.data.validation.ValidationError;
-import play.data.validation.Constraints.RequiredValidator;
-import play.i18n.Lang;
-import play.libs.F;
-import play.libs.F.*;
+import model.com.fpt.su11.sendmessage.PingActor;
+import model.com.fpt.su11.sheduler.MyActor;
+import model.com.fpt.su11.sheduler.Terminator;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import play.twirl.api.Content;
-
-import static play.test.Helpers.*;
-import static org.fest.assertions.Assertions.*;
+import scala.concurrent.duration.Duration;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Props;
 
 
 /**
@@ -27,19 +26,46 @@ import static org.fest.assertions.Assertions.*;
 *
 */
 public class ApplicationTest {
+  ActorSystem system;  
+  @Before
+  public void setup() throws IOException {
+    system = ActorSystem.create("MyActorSystem");
+  }
 
-    @Test
+    //@Test
     public void simpleCheck() {
         int a = 1 + 1;
         assertThat(a).isEqualTo(2);
     }
 
-    @Test
+   // @Test
     public void renderTemplate() {
         Content html = views.html.index.render("Your new application is ready.");
         assertThat(contentType(html)).isEqualTo("text/html");
         assertThat(contentAsString(html)).contains("Your new application is ready.");
     }
+    @Test
+    public void testSendMessageBetweenActor(){
+     // ActorSystem system = ActorSystem.create("MyActorSystem");
+      ActorRef pingActor = system.actorOf(Props.create(PingActor.class),"pingActor");
+//      ActorRef pingActor = system.actorOf(PingActor.props(), "pingActor");
+//      pingActor.tell(new PingActor.Initialize(), null);
+     //pingActor.tell(new PingActor.MyClass(-1), null);
+       pingActor.tell(new PingActor.MyClass(-1), null);
+      // This example app will ping pong 3 times and thereafter terminate the ActorSystem -
+      // see counter logic in PingActor
+      system.awaitTermination();
+    }
+    @Test
+    public void testSchedudule() {
+    //ActorSystem system = ActorSystem.create("MyActorSystem");
+    final ActorRef actorRef = system.actorOf(Props.create(MyActor.class),"myActor");
+    system.actorOf(Props.create(Terminator.class,actorRef),"myTerminated");
+    system.scheduler().schedule(Duration.create(0, TimeUnit.MILLISECONDS), 
+        Duration.create(5, TimeUnit.SECONDS), actorRef, "hello",system.dispatcher(), null);
+  //  cancellable.cancel();
+  //  system.scheduler().scheduleOnce(Duration.create(50, TimeUnit.MILLISECONDS), 
+  //  actorRef, "hello", system.dispatcher(), null);
 
-
+    }
 }
