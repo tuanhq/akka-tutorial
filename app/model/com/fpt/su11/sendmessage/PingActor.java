@@ -78,7 +78,7 @@ public class PingActor extends UntypedActor {
           if(counter == 10) {        
           
             System.out.println("because this is 10 th then stop");
-            getContext().stop(getSelf());;
+            getContext().stop(getSelf());
           }else {
             pongActor.tell(new MyClass(counter), getSelf());
           }

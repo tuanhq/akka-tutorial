@@ -1,6 +1,7 @@
 package model.com.fpt.su11.sendmessage;
 import model.com.fpt.su11.sendmessage.PingActor.MyClass;
 import model.com.fpt.su11.sendmessage.PongActor.PongMessage;
+import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
@@ -24,6 +25,7 @@ public class PongActor extends UntypedActor {
             return text;
         }
     }
+    
     
     public void onReceive(Object message) throws Exception {
         if (message instanceof PingActor.PingMessage) {
