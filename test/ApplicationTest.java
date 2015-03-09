@@ -13,7 +13,6 @@ import model.com.fpt.su11.sheduler.MyActor;
 import model.com.fpt.su11.sheduler.Terminator;
 
 import org.junit.Before;
-import org.junit.Test;
 
 import play.twirl.api.Content;
 import scala.concurrent.duration.Duration;
@@ -30,10 +29,13 @@ import akka.actor.Props;
 */
 public class ApplicationTest {
   ActorSystem system;  
+ 
   @Before
   public void setup() throws IOException {
     system = ActorSystem.create("MyActorSystem");
   }
+  
+ 
 
     //@Test
     public void simpleCheck() {
@@ -71,7 +73,7 @@ public class ApplicationTest {
   //  actorRef, "hello", system.dispatcher(), null);
 
     }
-    @Test
+   // @Test
     public void testRemote() {
       System.out.println("Start test remote");
       Thread thread1 = new Thread( new Runnable() {
