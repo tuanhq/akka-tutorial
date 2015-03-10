@@ -1,36 +1,48 @@
 package model.com.fpt.su11.faulthandle;
 
+import static akka.actor.SupervisorStrategy.escalate;
+import static akka.actor.SupervisorStrategy.restart;
+import static akka.actor.SupervisorStrategy.stop;
+import static akka.japi.Util.classTag;
+import static akka.pattern.Patterns.ask;
+import static akka.pattern.Patterns.pipe;
+import static model.com.fpt.su11.faulthandle.FaultTolerance.CounterServiceApi.GetCurrentCount;
+import static model.com.fpt.su11.faulthandle.FaultTolerance.WorkerApi.Do;
+import static model.com.fpt.su11.faulthandle.FaultTolerance.WorkerApi.Start;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import akka.actor.*;
-import akka.dispatch.Mapper;
-import akka.japi.Function;
+import model.com.fpt.su11.faulthandle.FaultTolerance.CounterApi.UseStorage;
+import model.com.fpt.su11.faulthandle.FaultTolerance.CounterServiceApi.CurrentCount;
+import model.com.fpt.su11.faulthandle.FaultTolerance.CounterServiceApi.Increment;
+import model.com.fpt.su11.faulthandle.FaultTolerance.CounterServiceApi.ServiceUnavailable;
+import model.com.fpt.su11.faulthandle.FaultTolerance.StorageApi.Entry;
+import model.com.fpt.su11.faulthandle.FaultTolerance.StorageApi.Get;
+import model.com.fpt.su11.faulthandle.FaultTolerance.StorageApi.StorageException;
+import model.com.fpt.su11.faulthandle.FaultTolerance.StorageApi.Store;
+import model.com.fpt.su11.faulthandle.FaultTolerance.WorkerApi.Progress;
 import scala.concurrent.duration.Duration;
-import akka.util.Timeout;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.OneForOneStrategy;
+import akka.actor.Props;
+import akka.actor.ReceiveTimeout;
+import akka.actor.SupervisorStrategy;
+import akka.actor.SupervisorStrategy.Directive;
+import akka.actor.UntypedActor;
+import akka.dispatch.Mapper;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import akka.japi.Function;
+import akka.util.Timeout;
+
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
-import static akka.japi.Util.classTag;
-
-import static akka.actor.SupervisorStrategy.resume;
-import static akka.actor.SupervisorStrategy.restart;
-import static akka.actor.SupervisorStrategy.stop;
-import static akka.actor.SupervisorStrategy.escalate;
-import akka.actor.SupervisorStrategy.Directive;
-import static akka.pattern.Patterns.ask;
-import static akka.pattern.Patterns.pipe;
-
-import static docs.actor.japi.FaultHandlingDocSample.WorkerApi.*;
-import static docs.actor.japi.FaultHandlingDocSample.CounterServiceApi.*;
-import static docs.actor.japi.FaultHandlingDocSample.CounterApi.*;
-import static docs.actor.japi.FaultHandlingDocSample.StorageApi.*;
-
-public class FaultHandlingDocSample {
+public class FaultTolerance {
 
   /**
    * Runs the sample
