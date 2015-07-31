@@ -25,10 +25,10 @@ import akka.actor.SupervisorStrategy.Directive;
 import static akka.pattern.Patterns.ask;
 import static akka.pattern.Patterns.pipe;
 
-import static docs.actor.japi.FaultHandlingDocSample.WorkerApi.*;
-import static docs.actor.japi.FaultHandlingDocSample.CounterServiceApi.*;
-import static docs.actor.japi.FaultHandlingDocSample.CounterApi.*;
-import static docs.actor.japi.FaultHandlingDocSample.StorageApi.*;
+import static model.com.fpt.su11.faulthandle.FaultHandlingDocSample.WorkerApi.*;
+import static model.com.fpt.su11.faulthandle.FaultHandlingDocSample.CounterServiceApi.*;
+import static model.com.fpt.su11.faulthandle.FaultHandlingDocSample.CounterApi.*;
+import static model.com.fpt.su11.faulthandle.FaultHandlingDocSample.StorageApi.*;
 
 public class FaultHandlingDocSample {
 
